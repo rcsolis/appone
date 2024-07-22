@@ -1,8 +1,8 @@
-import { CardGroup } from "react-bootstrap";
+import { CardGroup, Container } from "react-bootstrap";
 import { Card } from "react-bootstrap";
 import { Button } from "react-bootstrap";
 
-export const MakeRequests = ({signed, handleRequestNoAuth, handleRequestAuth}) => {
+export const MakeRequests = ({signed, handleRequestNoAuth, handleRequestAuth,handleRequestAuthRole}) => {
     return (
         <CardGroup style={{padding:'5px'}}>
             <Card
@@ -44,7 +44,10 @@ export const MakeRequests = ({signed, handleRequestNoAuth, handleRequestAuth}) =
                     </Card.Text>
                 </Card.Body>
                 <Card.Footer>
+                    <Container className="d-flex justify-content-evenly">
                     <Button variant="primary" onClick={handleRequestAuth}>Make secure request</Button>
+                    <Button variant="primary" onClick={handleRequestAuthRole}>Make secure request with Role</Button>
+                    </Container>
                 </Card.Footer>
             </Card>
             )}

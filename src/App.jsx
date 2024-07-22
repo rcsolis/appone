@@ -1,8 +1,8 @@
 import { MsalProvider, AuthenticatedTemplate, useMsal, UnauthenticatedTemplate } from '@azure/msal-react';
-import { Container, Button } from 'react-bootstrap';
+import { Container } from 'react-bootstrap';
 import { PageLayout } from './components/PageLayout';
 import { IdTokenData } from './components/DataDisplay';
-import { loginRequest } from './utils/authConfig';
+
 
 import './styles/App.css';
 import { MakeRequests } from './components/MakeRequests';
@@ -41,6 +41,31 @@ const MainContent = () => {
             console.error('There was an error!', error);
         });
     };
+    const handleRequestAuthRole = () => {
+      // Make request to backend API with Bearer token from MSAL
+      const tokenRequest = {
+          scopes: ["api://323d2ffd-0781-4c18-a725-fa643e5cad3d/allow_user"],
+          account: activeAccount,
+      };
+      instance.acquireTokenSilent(tokenRequest).then((accessTokenResponse) => {
+          fetch('http://localhost:5000/api/secure/owner', {
+              method: 'GET',
+              headers: {
+                  'Content-Type': 'text/plain',
+                  'Authorization': `Bearer ${accessTokenResponse.accessToken}`
+              },
+          })
+          .then((response) => response.text())
+          .then((data) => {
+              console.log(data);
+              document.getElementById('authResp').innerText = JSON.stringify(data);
+          })
+          .catch((error) => {
+              document.getElementById('authResp').innerText = JSON.stringify(error);
+              console.error('There was an error!', error);
+          });
+      });
+    };
     const handleRequestAuth = () => {
       // Make request to backend API with Bearer token from MSAL
       const tokenRequest = {
@@ -48,7 +73,7 @@ const MainContent = () => {
           account: activeAccount,
       };
       instance.acquireTokenSilent(tokenRequest).then((accessTokenResponse) => {
-          fetch('http://localhost:5000/api/secure', {
+          fetch('http://localhost:5000/api/secure/all', {
               method: 'GET',
               headers: {
                   'Content-Type': 'text/plain',
@@ -72,14 +97,20 @@ const MainContent = () => {
           {activeAccount ? (
                 <AuthenticatedTemplate>
                     <Container>
-                        <MakeRequests signed={true} handleRequestNoAuth={handleRequestNoAuth} handleRequestAuth={handleRequestAuth}/>
+                        <MakeRequests signed={true}
+                        handleRequestNoAuth={handleRequestNoAuth}
+                        handleRequestAuth={handleRequestAuth}
+                        handleRequestAuthRole={handleRequestAuthRole}/>
                         <IdTokenData idTokenClaims={activeAccount.idTokenClaims} />
                     </Container>
                 </AuthenticatedTemplate>
                 ) : (
                   <UnauthenticatedTemplate>
                       <h1> You need to Login for make authenticated requests</h1>
-                      <MakeRequests signed={false} handleRequestNoAuth={handleRequestNoAuth} handleRequestAuth={handleRequestAuth}/>
+                      <MakeRequests signed={false} 
+                        handleRequestNoAuth={handleRequestNoAuth}
+                        handleRequestAuth={handleRequestAuth}
+                        handleRequestAuthRole={handleRequestAuthRole}/>
                   </UnauthenticatedTemplate>
                 )}
         </div>

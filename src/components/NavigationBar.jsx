@@ -26,6 +26,9 @@ export const NavigationBar = () => {
                 </a>
                 <AuthenticatedTemplate>
                     <div className="collapse navbar-collapse justify-content-end">
+                        <span style={{color:"white", fontSize:"9pt", marginRight:"10px", fontWeight:"bolder"}}>
+                                Bienvenido, {instance.getActiveAccount()?.name}
+                        </span>
                         <Button variant="warning" onClick={handleLogoutRedirect}>
                             Salir
                         </Button>
